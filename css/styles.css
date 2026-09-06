@@ -162,7 +162,7 @@ p{ margin:0 0 1em; color:var(--gray-800); }
 }
 .hero-overlay{
   position:absolute; inset:0;
-  background:linear-gradient(100deg, rgba(8,14,23,0.94) 0%, rgba(8,14,23,0.9) 40%, rgba(8,14,23,0.72) 70%, rgba(8,14,23,0.88) 100%);
+  background:linear-gradient(100deg, rgba(8,14,23,0.82) 0%, rgba(8,14,23,0.68) 40%, rgba(8,14,23,0.32) 70%, rgba(8,14,23,0.55) 100%);
 }
 .hero-content{ position:relative; z-index:1; max-width:760px; padding-top:60px; padding-bottom:60px; }
 .eyebrow{
