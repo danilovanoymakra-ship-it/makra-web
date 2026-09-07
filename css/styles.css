@@ -175,19 +175,15 @@ p{ margin:0 0 1em; color:var(--gray-800); }
   object-fit:cover;
   object-position:center top;
   z-index:0;
+  filter:brightness(1.12) saturate(1.25) contrast(1.05);
 }
 @media (prefers-reduced-motion: reduce){
   .hero-bg-video{ display:none; }
-  .hero{
-    background-image:url('../images/hero-makra.jpg');
-    background-size:cover;
-    background-position:center top;
-  }
 }
 .hero-overlay{
   position:absolute; inset:0;
   z-index:0;
-  background:linear-gradient(100deg, rgba(8,14,23,0.82) 0%, rgba(8,14,23,0.68) 40%, rgba(8,14,23,0.32) 70%, rgba(8,14,23,0.55) 100%);
+  background:linear-gradient(100deg, rgba(8,14,23,0.6) 0%, rgba(8,14,23,0.46) 40%, rgba(8,14,23,0.16) 70%, rgba(8,14,23,0.36) 100%);
 }
 .hero-content{ position:relative; z-index:1; max-width:760px; padding-top:60px; padding-bottom:60px; }
 .eyebrow{
@@ -537,16 +533,11 @@ a.contact-card:hover{ background:var(--gray-200); }
 
 @media (max-width: 900px){
   .hero-overlay{
-    background:linear-gradient(180deg, rgba(8,14,23,0.5) 0%, rgba(8,14,23,0.72) 55%, rgba(8,14,23,0.85) 100%);
+    background:linear-gradient(180deg, rgba(8,14,23,0.28) 0%, rgba(8,14,23,0.48) 55%, rgba(8,14,23,0.65) 100%);
   }
-  /* En pantallas angostas "cover" recortaba demasiado y la máquina
-     quedaba a medias. Con "contain" siempre se ve completa, a la
-     misma resolución (no se reescala hacia abajo, solo deja de recortar);
-     el navy-900 de fondo llena el espacio sobrante arriba/abajo. */
-  .hero-bg-video{
-    object-fit:contain;
-    object-position:center center;
-  }
+  /* Video a pantalla completa (sin marco/letterbox), tal como antes:
+     "cover" recorta los costados en pantallas angostas, pero se ve
+     vivo y ocupa todo el hero en vez de quedar chiquito con barras. */
   .main-nav{
     position:fixed; top:78px; left:0; right:0;
     background:var(--navy-900);
