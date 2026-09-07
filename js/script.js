@@ -146,4 +146,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ---- Video de fondo del hero: reintenta reproducir si el navegador
+     (sobre todo en celular) bloqueó el autoplay inicial ---- */
+  const heroVideo = document.getElementById('heroVideo');
+  if (heroVideo) {
+    const tryPlay = () => { heroVideo.play().catch(() => {}); };
+    tryPlay();
+    const resumeOnInteraction = () => {
+      if (heroVideo.paused) tryPlay();
+      ['touchstart', 'click', 'scroll'].forEach(evt =>
+        document.removeEventListener(evt, resumeOnInteraction)
+      );
+    };
+    ['touchstart', 'click', 'scroll'].forEach(evt =>
+      document.addEventListener(evt, resumeOnInteraction, { passive: true, once: true })
+    );
+  }
+
 });
