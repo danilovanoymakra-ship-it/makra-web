@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const quoteForm = document.getElementById('quoteForm');
   if (quoteForm) {
     if (typeof emailjs !== 'undefined') {
-      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      emailjs.init(EMAILJS_PUBLIC_KEY);
     }
 
     const categoriasOrden = ['concreto', 'herramienta', 'energia', 'andamiaje', 'topografia', 'otros'];
