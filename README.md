@@ -51,14 +51,50 @@ Si más adelante agregan o quitan equipos del inventario, tráeme la lista actua
 
 **Redes sociales**: en la sección de Contacto y en el footer, los íconos de Facebook, Instagram y TikTok todavía apuntan a `href="#"` — cámbialos por los enlaces reales de tus perfiles cuando los tengas.
 
-## 4. El formulario de contacto
+## 4. Los formularios (Cotizador y Contacto)
 
-El formulario de la sección de Contacto (en `index.html`) es una **plantilla visual**: por ahora solo muestra un mensaje de alerta al enviarse, no manda correos todavía. Para que realmente te lleguen los mensajes tienes dos opciones sencillas y gratuitas (no requieren programar backend):
+### 4.1 Formulario "Envíanos un mensaje" (sección Contacto)
 
-- **Formspree** (https://formspree.io): creas una cuenta gratis, te dan una URL, y solo cambias el `<form class="contact-form">` por `<form class="contact-form" action="https://formspree.io/f/TU_ID" method="POST">` (quitando el `e.preventDefault()` correspondiente en `js/script.js`, o siguiendo la guía de Formspree).
-- **EmailJS** (https://www.emailjs.com): permite enviar el formulario directo desde JavaScript sin backend, con una cuenta gratuita.
+Es una **plantilla visual**: por ahora solo muestra un mensaje de alerta al enviarse, no manda correos. Si quieres que también envíe correos de verdad, se puede conectar igual que el Cotizador (ver abajo) o con Formspree (https://formspree.io).
 
-Si prefieres algo más simple mientras tanto, puedes ocultar el formulario y dejar solo los botones de WhatsApp y teléfono, que ya funcionan sin configuración adicional.
+### 4.2 Formulario "Cotizador" (sección Cotizador) — cómo activar el envío real
+
+Este formulario ya está **completamente programado** para enviar por correo con **EmailJS** (gratis hasta 200 correos/mes, sin backend). Lo único que falta es que tú crees la cuenta gratuita y me pases (o pongas tú mismo) 3 datos. Pasos:
+
+1. Entra a https://www.emailjs.com y crea una cuenta gratis (puedes usar tu Gmail `makra.sas.col@gmail.com`).
+2. En el panel, ve a **Email Services** → **Add New Service** → elige **Gmail** (u Outlook) y conecta esa misma cuenta de correo. Te va a dar un **Service ID** (algo como `service_xxxxxxx`).
+3. Ve a **Email Templates** → **Create New Template**. En el campo **"To Email"** de la plantilla escribe `makra.sas.col@gmail.com` (para que ahí lleguen las cotizaciones). En **"Reply To"** puedes poner `{{from_email}}` (así puedes responderle al cliente directo). En el cuerpo del correo puedes usar estas variables, que ya le manda el formulario:
+   - `{{from_name}}` — nombre del cliente
+   - `{{from_phone}}` — teléfono del cliente
+   - `{{from_email}}` — correo del cliente
+   - `{{categorias}}` — lista de lo que marcó, con los días de uso de cada uno
+   - `{{mensaje}}` — el mensaje adicional que escribió
+
+   Ejemplo de cuerpo de plantilla:
+   ```
+   Nueva solicitud de cotización — MAKRA
+
+   Nombre: {{from_name}}
+   Teléfono: {{from_phone}}
+   Correo: {{from_email}}
+
+   Necesita:
+   {{categorias}}
+
+   Mensaje adicional:
+   {{mensaje}}
+   ```
+   Guarda la plantilla y copia su **Template ID** (algo como `template_xxxxxxx`).
+4. Ve a **Account** → **General** y copia tu **Public Key**.
+5. Abre `js/script.js`, busca estas 3 líneas cerca del comentario "Cotizador" y reemplaza los valores de ejemplo por los tuyos:
+   ```js
+   const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY_AQUI';
+   const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID_AQUI';
+   const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID_AQUI';
+   ```
+6. Guarda, sube el cambio a GitHub (`git add js/script.js`, `git commit`, `git push`) y espera a que Cloudflare Pages termine de desplegar. Prueba el Cotizador en el sitio en vivo — debería llegarte el correo a `makra.sas.col@gmail.com`.
+
+Mientras estos 3 valores sigan siendo los de ejemplo, el botón del Cotizador muestra un aviso pidiendo escribir por WhatsApp en su lugar, en vez de fallar en silencio.
 
 ## 5. Publicar el sitio (hosting gratis recomendado: Netlify)
 

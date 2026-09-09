@@ -142,6 +142,108 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* ---- Cotizador: selección de categorías + días, envío por EmailJS ----
+     IMPORTANTE: para que este formulario SÍ llegue al correo, reemplaza
+     los 3 valores de abajo por los de tu cuenta gratuita en emailjs.com
+     (ver instrucciones completas en README.md). Mientras tengan estos
+     valores de ejemplo, el formulario mostrará un mensaje de error al
+     enviar en vez de mandar el correo. */
+  const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY_AQUI';
+  const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID_AQUI';
+  const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID_AQUI';
+
+  const quoteForm = document.getElementById('quoteForm');
+  if (quoteForm) {
+    if (typeof emailjs !== 'undefined') {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    const categoryChecks = quoteForm.querySelectorAll('.category-check');
+    categoryChecks.forEach((row) => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      const daysInput = row.querySelector('input[type="number"]');
+      checkbox.addEventListener('change', () => {
+        daysInput.disabled = !checkbox.checked;
+        row.classList.toggle('is-checked', checkbox.checked);
+        if (!checkbox.checked) {
+          daysInput.value = '';
+        } else {
+          daysInput.focus();
+        }
+      });
+    });
+
+    const quoteStatus = document.getElementById('quoteStatus');
+    const quoteSubmitBtn = document.getElementById('quoteSubmitBtn');
+
+    quoteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      quoteStatus.textContent = '';
+      quoteStatus.className = 'quote-status';
+
+      // Reunir categorías marcadas junto con sus días de uso
+      const seleccion = [];
+      let faltaDias = false;
+      categoryChecks.forEach((row) => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        const daysInput = row.querySelector('input[type="number"]');
+        if (checkbox.checked) {
+          const dias = daysInput.value.trim();
+          if (!dias) faltaDias = true;
+          seleccion.push(`${checkbox.value}: ${dias || '(días sin especificar)'} día(s)`);
+        }
+      });
+
+      if (seleccion.length === 0) {
+        quoteStatus.textContent = 'Marca al menos una categoría de equipo que necesites.';
+        quoteStatus.className = 'quote-status is-error';
+        return;
+      }
+      if (faltaDias) {
+        quoteStatus.textContent = 'Indica los días de uso para cada categoría que marcaste.';
+        quoteStatus.className = 'quote-status is-error';
+        return;
+      }
+
+      const formData = new FormData(quoteForm);
+      const params = {
+        from_name: formData.get('nombre'),
+        from_phone: formData.get('telefono'),
+        from_email: formData.get('email'),
+        categorias: seleccion.join('\n'),
+        mensaje: formData.get('mensaje') || '(sin mensaje adicional)',
+      };
+
+      if (typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY_AQUI') {
+        quoteStatus.textContent = 'El envío por correo aún no está configurado. Mientras tanto, escríbenos directo por WhatsApp con estos datos.';
+        quoteStatus.className = 'quote-status is-error';
+        return;
+      }
+
+      quoteSubmitBtn.disabled = true;
+      quoteSubmitBtn.textContent = 'Enviando...';
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(() => {
+          quoteStatus.textContent = '¡Listo! Recibimos tu solicitud y te contactaremos pronto.';
+          quoteStatus.className = 'quote-status is-success';
+          quoteForm.reset();
+          categoryChecks.forEach((row) => {
+            row.classList.remove('is-checked');
+            row.querySelector('input[type="number"]').disabled = true;
+          });
+        })
+        .catch(() => {
+          quoteStatus.textContent = 'No pudimos enviar la solicitud. Intenta de nuevo o escríbenos por WhatsApp.';
+          quoteStatus.className = 'quote-status is-error';
+        })
+        .finally(() => {
+          quoteSubmitBtn.disabled = false;
+          quoteSubmitBtn.textContent = 'Enviar solicitud de cotización';
+        });
+    });
+  }
+
   /* ---- Año dinámico en el footer ---- */
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
