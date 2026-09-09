@@ -204,9 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
      (ver instrucciones completas en README.md). Mientras tengan estos
      valores de ejemplo, el formulario mostrará un mensaje de error al
      enviar en vez de mandar el correo. */
-  const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY_AQUI';
-  const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID_AQUI';
-  const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID_AQUI';
+  const EMAILJS_PUBLIC_KEY = '7-pNTGmMSXsjJ4gNS';
+  const EMAILJS_SERVICE_ID = 'service_iw2wenc';
+  const EMAILJS_TEMPLATE_ID = 'template_lhs48r2';
 
   const quoteForm = document.getElementById('quoteForm');
   if (quoteForm) {
