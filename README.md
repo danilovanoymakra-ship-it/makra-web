@@ -45,19 +45,19 @@ El correo de contacto (`contacto@grupomakra.com`) es un **placeholder**: debes c
 - **9 proyectos reales** en la página de Construcción, con fotos del portafolio (ya recortadas para no mostrar ningún logo).
 - **Logos de clientes reales** en la sección "Nuestros Clientes" del inicio.
 - **Teléfono / WhatsApp real**: +57 317 381 1484.
-- **34 equipos reales de alquiler**, con foto de catálogo y marca de cada uno (tomado del listado que enviaste): 2 en Maquinaria Pesada (Retroexcavadora Bobcat B760, Minicargador Bobcat S530) y 32 en Equipos Livianos, agrupados en 6 categorías con filtro (Concreto y Compactación, Herramienta Eléctrica, Plantas Eléctricas, Andamiaje y Accesorios, Topografía y Calidad, Otros Equipos).
+- **36 equipos reales de alquiler**, con foto de catálogo y marca de cada uno: 4 en Maquinaria Pesada (Excavadora SANY SY135C, Rodillo Vibratorio Doble 1.300kg, Retroexcavadora Bobcat B760, Minicargador Bobcat S530) y 32 en Equipos Livianos, agrupados en 6 categorías con filtro (Concreto y Compactación, Herramienta Eléctrica, Plantas Eléctricas, Andamiaje y Accesorios, Topografía y Calidad, Otros Equipos). Todos estos equipos también se pueden seleccionar directamente en el cotizador de la sección Contacto.
 
 Si más adelante agregan o quitan equipos del inventario, tráeme la lista actualizada (o el mismo tipo de documento con fotos) y actualizo las tarjetas correspondientes en `alquiler-equipos-livianos.html` o `alquiler-maquinaria-pesada.html`.
 
 **Redes sociales**: en la sección de Contacto y en el footer, los íconos de Facebook, Instagram y TikTok todavía apuntan a `href="#"` — cámbialos por los enlaces reales de tus perfiles cuando los tengas.
 
-## 4. Los formularios (Cotizador y Contacto)
+## 4. El formulario "Arma tu cotización" (sección Contacto)
 
-### 4.1 Formulario "Envíanos un mensaje" (sección Contacto)
+El antiguo formulario simple "Envíanos un mensaje" y el Cotizador ahora son **un solo formulario**, dentro de la sección Contacto (`index.html`): el cliente elige la línea (Maquinaria Pesada y/o Equipos Livianos), marca con su foto los equipos puntuales que necesita (agrupados por categoría en Equipos Livianos, igual que en el catálogo), da clic en **"Agrupar selección"** y ahí puede indicar los días de alquiler de cada equipo antes de completar sus datos y enviar.
 
-Es una **plantilla visual**: por ahora solo muestra un mensaje de alerta al enviarse, no manda correos. Si quieres que también envíe correos de verdad, se puede conectar igual que el Cotizador (ver abajo) o con Formspree (https://formspree.io).
+El catálogo de equipos que se muestra en el cotizador vive en `js/script.js`, en el arreglo `EQUIPOS` (al inicio del bloque "Cotizador"). Si agregan o quitan un equipo del inventario, se edita ahí mismo (nombre, imagen, línea y categoría) — no hace falta tocar el HTML.
 
-### 4.2 Formulario "Cotizador" (sección Cotizador) — cómo activar el envío real
+### Cómo activar el envío real por correo
 
 Este formulario ya está **completamente programado** para enviar por correo con **EmailJS** (gratis hasta 200 correos/mes, sin backend). Lo único que falta es que tú crees la cuenta gratuita y me pases (o pongas tú mismo) 3 datos. Pasos:
 
@@ -67,8 +67,8 @@ Este formulario ya está **completamente programado** para enviar por correo con
    - `{{from_name}}` — nombre del cliente
    - `{{from_phone}}` — teléfono del cliente
    - `{{from_email}}` — correo del cliente
-   - `{{categorias}}` — lista de lo que marcó, con los días de uso de cada uno
-   - `{{mensaje}}` — el mensaje adicional que escribió
+   - `{{equipos}}` — el mensaje "Deseo consultar o cotizar el alquiler de estos equipos" junto con la lista de equipos marcados y sus días de alquiler
+   - `{{mensaje}}` — el mensaje adicional (opcional) que escribió
 
    Ejemplo de cuerpo de plantilla:
    ```
@@ -78,8 +78,7 @@ Este formulario ya está **completamente programado** para enviar por correo con
    Teléfono: {{from_phone}}
    Correo: {{from_email}}
 
-   Necesita:
-   {{categorias}}
+   {{equipos}}
 
    Mensaje adicional:
    {{mensaje}}

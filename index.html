@@ -35,7 +35,6 @@
       <a href="index.html" class="nav-link">Inicio</a>
       <a href="alquiler-equipos-livianos.html" class="nav-link">Equipos Livianos</a>
       <a href="alquiler-maquinaria-pesada.html" class="nav-link">Maquinaria Pesada</a>
-      <a href="index.html#cotizador" class="nav-link">Cotizador</a>
       <a href="index.html#contacto" class="nav-link">Contacto</a>
     </nav>
 
@@ -195,174 +194,100 @@
   </div>
 </section>
 
-<!-- ===== COTIZADOR ===== -->
-<section class="section section-alt" id="cotizador">
+<!-- ===== CONTACTO + COTIZADOR (formulario unificado) ===== -->
+<section class="section" id="contacto">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="section-tag">Cotizador</span>
-      <h2>Solicita tu cotización</h2>
-      <p>Marca lo que necesitas y cuéntanos por cuántos días. Te la enviamos directo a tu WhatsApp o correo.</p>
-    </div>
-
-    <form class="quote-card" id="quoteForm" data-reveal>
-      <div class="form-row">
-        <label>Nombre
-          <input type="text" name="nombre" placeholder="Tu nombre" required>
-        </label>
-        <label>Teléfono
-          <input type="tel" name="telefono" placeholder="Tu número de contacto" required>
-        </label>
-      </div>
-      <label>Correo
-        <input type="email" name="email" placeholder="tucorreo@ejemplo.com" required>
-      </label>
-
-      <fieldset class="quote-fieldset">
-        <legend>¿Qué necesitas? (marca una o varias, y los días de uso)</legend>
-        <div class="category-list">
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Maquinaria Pesada" data-cat="pesada">
-            <span class="category-name">Maquinaria Pesada</span>
-            <span class="category-days">
-              <label for="dias-pesada">Días</label>
-              <input type="number" id="dias-pesada" min="1" max="365" data-days-for="pesada" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Concreto y Compactación" data-cat="concreto">
-            <span class="category-name">Concreto y Compactación</span>
-            <span class="category-days">
-              <label for="dias-concreto">Días</label>
-              <input type="number" id="dias-concreto" min="1" max="365" data-days-for="concreto" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Herramienta Eléctrica" data-cat="herramienta">
-            <span class="category-name">Herramienta Eléctrica</span>
-            <span class="category-days">
-              <label for="dias-herramienta">Días</label>
-              <input type="number" id="dias-herramienta" min="1" max="365" data-days-for="herramienta" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Plantas Eléctricas" data-cat="energia">
-            <span class="category-name">Plantas Eléctricas</span>
-            <span class="category-days">
-              <label for="dias-energia">Días</label>
-              <input type="number" id="dias-energia" min="1" max="365" data-days-for="energia" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Andamiaje y Accesorios" data-cat="andamiaje">
-            <span class="category-name">Andamiaje y Accesorios</span>
-            <span class="category-days">
-              <label for="dias-andamiaje">Días</label>
-              <input type="number" id="dias-andamiaje" min="1" max="365" data-days-for="andamiaje" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Topografía y Calidad" data-cat="topografia">
-            <span class="category-name">Topografía y Calidad</span>
-            <span class="category-days">
-              <label for="dias-topografia">Días</label>
-              <input type="number" id="dias-topografia" min="1" max="365" data-days-for="topografia" disabled>
-            </span>
-          </label>
-          <label class="category-check">
-            <input type="checkbox" name="categoria" value="Otros Equipos" data-cat="otros">
-            <span class="category-name">Otros Equipos</span>
-            <span class="category-days">
-              <label for="dias-otros">Días</label>
-              <input type="number" id="dias-otros" min="1" max="365" data-days-for="otros" disabled>
-            </span>
-          </label>
-        </div>
-      </fieldset>
-
-      <label>Mensaje adicional (opcional)
-        <textarea name="mensaje" rows="3" placeholder="Detalles del equipo, cantidades, fechas, ubicación de la obra, etc."></textarea>
-      </label>
-
-      <button type="submit" class="btn btn-primary btn-block" id="quoteSubmitBtn">Enviar solicitud de cotización</button>
-      <p class="quote-status" id="quoteStatus" role="status" aria-live="polite"></p>
-    </form>
-  </div>
-</section>
-
-<!-- ===== CONTACTO ===== -->
-<section class="section" id="contacto">
-  <div class="container contact-grid">
-    <div data-reveal>
       <span class="section-tag">Contacto</span>
       <h2>Hablemos de tu proyecto</h2>
-      <p class="contact-lead">
-        Escríbenos por WhatsApp, correo o síguenos en redes sociales. Con gusto te atendemos.
-      </p>
+      <p>Escríbenos por WhatsApp, correo, o arma tu cotización aquí mismo seleccionando los equipos que necesitas.</p>
+    </div>
 
-      <div class="contact-cards">
-        <a class="contact-card contact-card-icon-only" target="_blank" rel="noopener" href="https://wa.me/573173811484" aria-label="Escríbenos por WhatsApp">
-          <svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.37 3 3.96 8.4 3.96 15.06c0 2.23.61 4.36 1.75 6.24L3 29l7.9-2.66a12.02 12.02 0 0 0 5.14 1.15h.01c6.67 0 12.08-5.4 12.08-12.06C28.13 8.4 22.71 3 16.04 3zm0 21.9h-.01a9.9 9.9 0 0 1-5.05-1.38l-.36-.21-4.69 1.58 1.58-4.57-.24-.38a9.86 9.86 0 0 1-1.52-5.28C5.75 9.5 10.34 5 16.04 5c2.65 0 5.14 1.03 7.01 2.9a9.83 9.83 0 0 1 2.9 6.97c0 5.5-4.6 9.99-9.91 9.99zm5.44-7.44c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.06 2.88 1.21 3.08c.15.2 2.09 3.2 5.08 4.48.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z"/></svg>
-          <span>WhatsApp</span>
-        </a>
-        <a class="contact-card" href="mailto:makra.sas.col@gmail.com">
-          <span class="contact-icon">✉️</span>
-          <div>
-            <strong>Correo</strong>
-            <span>makra.sas.col@gmail.com</span>
+    <div class="contact-layout">
+      <div class="contact-info" data-reveal>
+        <div class="contact-cards">
+          <a class="contact-card contact-card-icon-only" target="_blank" rel="noopener" href="https://wa.me/573173811484" aria-label="Escríbenos por WhatsApp">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.37 3 3.96 8.4 3.96 15.06c0 2.23.61 4.36 1.75 6.24L3 29l7.9-2.66a12.02 12.02 0 0 0 5.14 1.15h.01c6.67 0 12.08-5.4 12.08-12.06C28.13 8.4 22.71 3 16.04 3zm0 21.9h-.01a9.9 9.9 0 0 1-5.05-1.38l-.36-.21-4.69 1.58 1.58-4.57-.24-.38a9.86 9.86 0 0 1-1.52-5.28C5.75 9.5 10.34 5 16.04 5c2.65 0 5.14 1.03 7.01 2.9a9.83 9.83 0 0 1 2.9 6.97c0 5.5-4.6 9.99-9.91 9.99zm5.44-7.44c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.06 2.88 1.21 3.08c.15.2 2.09 3.2 5.08 4.48.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z"/></svg>
+            <span>WhatsApp</span>
+          </a>
+          <a class="contact-card" href="mailto:makra.sas.col@gmail.com">
+            <span class="contact-icon">✉️</span>
+            <div>
+              <strong>Correo</strong>
+              <span>makra.sas.col@gmail.com</span>
+            </div>
+          </a>
+          <div class="contact-card">
+            <span class="contact-icon">📍</span>
+            <div>
+              <strong>Cobertura</strong>
+              <span>Magdalena, Atlántico, Cesar, Cundinamarca y Tolima</span>
+            </div>
           </div>
-        </a>
-        <div class="contact-card">
-          <span class="contact-icon">📍</span>
-          <div>
-            <strong>Cobertura</strong>
-            <span>Magdalena, Atlántico, Cesar, Cundinamarca y Tolima</span>
-          </div>
+        </div>
+
+        <div class="social-row">
+          <a href="#" target="_blank" rel="noopener" aria-label="Facebook" class="social-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Instagram" class="social-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.55.55.89 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.42.06 4.12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.76 4.9 4.9 0 0 1-1.76 1.15c-.64.25-1.37.42-2.43.47-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.76-1.15 4.9 4.9 0 0 1-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.7 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76A4.9 4.9 0 0 1 5.44.54C6.08.29 6.81.12 7.87.07 8.94.02 9.3 0 12 0zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zm5.2-8.4a1.17 1.17 0 1 1 0-2.33 1.17 1.17 0 0 1 0 2.33z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" aria-label="TikTok" class="social-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82a4.28 4.28 0 0 1-3.14-1.4V15.5a5.5 5.5 0 1 1-4.72-5.44v2.5a3 3 0 1 0 2.22 2.9V2h2.5a4.28 4.28 0 0 0 3.14 3.82z"/></svg>
+          </a>
         </div>
       </div>
 
-      <div class="social-row">
-        <a href="#" target="_blank" rel="noopener" aria-label="Facebook" class="social-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg>
-        </a>
-        <a href="#" target="_blank" rel="noopener" aria-label="Instagram" class="social-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.55.55.89 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.42.06 4.12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.76 4.9 4.9 0 0 1-1.76 1.15c-.64.25-1.37.42-2.43.47-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.76-1.15 4.9 4.9 0 0 1-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.7 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76A4.9 4.9 0 0 1 5.44.54C6.08.29 6.81.12 7.87.07 8.94.02 9.3 0 12 0zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zm5.2-8.4a1.17 1.17 0 1 1 0-2.33 1.17 1.17 0 0 1 0 2.33z"/></svg>
-        </a>
-        <a href="#" target="_blank" rel="noopener" aria-label="TikTok" class="social-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82a4.28 4.28 0 0 1-3.14-1.4V15.5a5.5 5.5 0 1 1-4.72-5.44v2.5a3 3 0 1 0 2.22 2.9V2h2.5a4.28 4.28 0 0 0 3.14 3.82z"/></svg>
-        </a>
-      </div>
-    </div>
+      <form class="contact-form quote-form" id="quoteForm" data-reveal novalidate>
+        <span class="section-tag">Cotizador</span>
+        <h3>Arma tu cotización</h3>
+        <p class="quote-intro">
+          Selecciona la línea que necesitas, marca los equipos con su foto y agrúpalos.
+          Te escribimos con la información lista para confirmar disponibilidad.
+        </p>
 
-    <form class="contact-form" data-reveal>
-      <span class="section-tag">Formulario</span>
-      <h2>Envíanos un mensaje</h2>
-      <div class="form-row">
-        <label>Nombre
-          <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <div class="quote-picker" id="quotePicker">
+          <div class="quote-line-toggle" role="group" aria-label="¿Qué necesitas?">
+            <span class="quote-line-label">¿Qué necesitas?</span>
+            <button type="button" class="line-btn" data-line="pesada" aria-pressed="false">Maquinaria Pesada</button>
+            <button type="button" class="line-btn" data-line="liviana" aria-pressed="false">Equipos Livianos</button>
+          </div>
+
+          <div class="quote-items-wrap" id="quoteItemsPesada" hidden></div>
+          <div class="quote-items-wrap" id="quoteItemsLiviana" hidden></div>
+
+          <button type="button" class="btn btn-outline btn-sm quote-group-btn" id="groupBtn" disabled>
+            Agrupar selección <span class="quote-sel-count" id="selCount">(0)</span>
+          </button>
+          <p class="quote-hint" id="quoteHint">Marca uno o varios equipos para agruparlos en tu solicitud.</p>
+        </div>
+
+        <div class="quote-summary" id="quoteSummary" hidden>
+          <p class="quote-summary-msg">Deseo consultar o cotizar el alquiler de estos equipos:</p>
+          <div class="summary-list" id="summaryList"></div>
+          <button type="button" class="quote-edit-link" id="editSelectionBtn">← Editar selección de equipos</button>
+        </div>
+
+        <div class="form-row">
+          <label>Nombre
+            <input type="text" name="nombre" placeholder="Tu nombre" required>
+          </label>
+          <label>Teléfono
+            <input type="tel" name="telefono" placeholder="Tu número de contacto" required>
+          </label>
+        </div>
+        <label>Correo
+          <input type="email" name="email" placeholder="tucorreo@ejemplo.com" required>
         </label>
-        <label>Teléfono
-          <input type="tel" name="telefono" placeholder="Tu número de contacto" required>
+        <label>Mensaje adicional (opcional)
+          <textarea name="mensaje" rows="3" placeholder="Detalles extra: fechas, dirección de la obra, etc."></textarea>
         </label>
-      </div>
-      <label>Correo
-        <input type="email" name="email" placeholder="tucorreo@ejemplo.com" required>
-      </label>
-      <label>¿Qué necesitas?
-        <select name="interes">
-          <option value="livianos">Alquilar equipos livianos</option>
-          <option value="pesada">Alquilar maquinaria pesada</option>
-          <option value="otro">Otro servicio (construcción, consultoría, topografía)</option>
-        </select>
-      </label>
-      <label>Mensaje
-        <textarea name="mensaje" rows="4" placeholder="Cuéntanos brevemente qué necesitas" required></textarea>
-      </label>
-      <button type="submit" class="btn btn-primary btn-block">Enviar mensaje</button>
-      <p class="form-note">
-        Nota: este formulario es una plantilla. Debes conectarlo a un servicio como Formspree,
-        EmailJS o tu propio backend para que los mensajes te lleguen (ver README.md).
-      </p>
-    </form>
+
+        <button type="submit" class="btn btn-primary btn-block" id="quoteSubmitBtn">Enviar solicitud de cotización</button>
+        <p class="quote-status" id="quoteStatus"></p>
+      </form>
+    </div>
   </div>
 </section>
 
