@@ -63,7 +63,7 @@ Este formulario ya está **completamente programado** para enviar por correo con
 
 1. Entra a https://www.emailjs.com y crea una cuenta gratis (puedes usar tu Gmail `makra.sas.col@gmail.com`).
 2. En el panel, ve a **Email Services** → **Add New Service** → elige **Gmail** (u Outlook) y conecta esa misma cuenta de correo. Te va a dar un **Service ID** (algo como `service_xxxxxxx`).
-3. Ve a **Email Templates** → **Create New Template**. En el campo **"To Email"** de la plantilla escribe `makra.sas.col@gmail.com` (para que ahí lleguen las cotizaciones). En **"Reply To"** puedes poner `{{from_email}}` (así puedes responderle al cliente directo). En el cuerpo del correo puedes usar estas variables, que ya le manda el formulario:
+3. Ve a **Email Templates** → **Create New Template**. En el campo **"To Email"** de la plantilla escribe `makra.sas.col@gmail.com` (para que ahí lleguen las cotizaciones). En **"Reply To"** puedes poner `{{from_email}}` (así puedes responderle al cliente directo). En **"Subject"** escribe exactamente `Nueva solicitud de cotización — MAKRA` (deja ese texto fijo, sin variables) — así todos los correos del cotizador llegan con el mismo asunto y puedes armar el filtro de Gmail del paso siguiente. En el cuerpo del correo puedes usar estas variables, que ya le manda el formulario:
    - `{{from_name}}` — nombre del cliente
    - `{{from_phone}}` — teléfono del cliente
    - `{{from_email}}` — correo del cliente
@@ -94,6 +94,18 @@ Este formulario ya está **completamente programado** para enviar por correo con
 6. Guarda, sube el cambio a GitHub (`git add js/script.js`, `git commit`, `git push`) y espera a que Cloudflare Pages termine de desplegar. Prueba el Cotizador en el sitio en vivo — debería llegarte el correo a `makra.sas.col@gmail.com`.
 
 Mientras estos 3 valores sigan siendo los de ejemplo, el botón del Cotizador muestra un aviso pidiendo escribir por WhatsApp en su lugar, en vez de fallar en silencio.
+
+### Que las cotizaciones nunca se pierdan: organízalas con una etiqueta en Gmail
+
+Para que cada correo de cotización quede aparte y no se te pase entre el resto del correo, crea un filtro en Gmail que lo etiquete automáticamente (esto lo haces tú mismo, una sola vez, directo en tu cuenta de Gmail — no requiere tocar el código):
+
+1. Entra a `makra.sas.col@gmail.com` en Gmail.
+2. En la barra de búsqueda, escribe: `subject:"Nueva solicitud de cotización — MAKRA"` y da clic en el ícono de opciones de búsqueda (la flechita o los controles deslizantes, a la derecha de la barra).
+3. Confirma que quede el mismo texto en el campo "Asunto" y da clic en **"Crear filtro"**.
+4. Marca la casilla **"Aplicar la etiqueta"** → **"Nueva etiqueta"** → escribe algo como `Cotizaciones Web` → **Crear**.
+5. Puedes también marcar **"Destacarlo siempre"** o **"Marcar como importante"** si quieres que resalte. **No** marques "Archivarlo", así el correo sigue apareciendo en tu bandeja de entrada además de quedar guardado bajo esa etiqueta — nunca se pierde y además queda ordenado.
+6. Si quieres que también aplique a cotizaciones que ya te hayan llegado antes, marca **"Aplicar también a las conversaciones que coincidan"** antes de crear el filtro.
+7. Da clic en **"Crear filtro"**. Listo — desde ahora, cada vez que alguien cotice desde la página, el correo te llega a la bandeja normal y también queda guardado en la etiqueta "Cotizaciones Web" (la ves en la barra lateral izquierda de Gmail), para que puedas repasarlas todas juntas cuando quieras.
 
 ## 5. Publicar el sitio (hosting gratis recomendado: Netlify)
 

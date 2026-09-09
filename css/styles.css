@@ -641,7 +641,20 @@ a.contact-card:hover{ background:var(--gray-200); }
   color:var(--navy-900);
 }
 
-.quote-done-btn{ align-self:flex-start; }
+.quote-done-btn{
+  align-self:flex-start;
+  background:linear-gradient(135deg, var(--yellow) 0%, #FF8A3D 100%);
+  border-color:transparent;
+  color:var(--navy-900);
+  box-shadow:0 6px 18px rgba(245,138,1,0.35);
+}
+.quote-done-btn:hover{ box-shadow:0 10px 22px rgba(245,138,1,0.5); }
+.quote-done-btn:disabled{
+  background:var(--gray-200);
+  color:var(--gray-400);
+  box-shadow:none;
+  opacity:1;
+}
 
 .quote-summary{
   background:var(--white);
