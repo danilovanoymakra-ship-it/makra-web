@@ -214,12 +214,17 @@ document.addEventListener('DOMContentLoaded', () => {
       emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
     }
 
-    const wrapPesada = document.getElementById('quoteItemsPesada');
-    const wrapLiviana = document.getElementById('quoteItemsLiviana');
-    const lineButtons = quoteForm.querySelectorAll('.line-btn');
-    const groupBtn = document.getElementById('groupBtn');
-    const selCount = document.getElementById('selCount');
-    const quoteHint = document.getElementById('quoteHint');
+    const categoriasOrden = ['concreto', 'herramienta', 'energia', 'andamiaje', 'topografia', 'otros'];
+    const equipoPorId = (id) => EQUIPOS.find((e) => e.id === id);
+
+    const tabs = Array.from(quoteForm.querySelectorAll('.quote-tab'));
+    const catChipsWrap = document.getElementById('quoteCatChips');
+    const searchInput = document.getElementById('quoteSearch');
+    const quotePlaceholder = document.getElementById('quotePlaceholder');
+    const listWrap = document.getElementById('quoteList');
+    const doneBtn = document.getElementById('quoteDoneBtn');
+    const selCountEl = document.getElementById('selCount');
+    const doneCountEl = document.getElementById('doneCount');
     const quotePicker = document.getElementById('quotePicker');
     const quoteSummary = document.getElementById('quoteSummary');
     const summaryList = document.getElementById('summaryList');
@@ -227,82 +232,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteStatus = document.getElementById('quoteStatus');
     const quoteSubmitBtn = document.getElementById('quoteSubmitBtn');
 
-    const diasGuardados = {}; // id -> días capturados, se conservan al reagrupar
+    let currentLine = null;   // 'pesada' | 'liviana' | null
+    let currentCat = 'all';   // solo aplica cuando currentLine === 'liviana'
+    let searchTerm = '';
+    const selectedIds = new Set();  // se conserva al cambiar de línea/categoría
+    const diasGuardados = {};       // id -> días capturados
 
-    // ---- Pintar las tarjetas de equipos (una sola vez) ----
-    const crearTarjeta = (equipo) => {
-      const label = document.createElement('label');
-      label.className = 'quote-item';
-      label.innerHTML = `
-        <div class="quote-item-thumb">
-          <img src="${equipo.img}" alt="${equipo.name}" loading="lazy">
-          <input type="checkbox" class="quote-item-check" value="${equipo.id}" aria-label="Seleccionar ${equipo.name}">
-        </div>
-        <span class="quote-item-name">${equipo.name}</span>
-      `;
-      return label;
-    };
-
-    const pesada = EQUIPOS.filter((e) => e.line === 'pesada');
-    const grid = document.createElement('div');
-    grid.className = 'quote-items-grid';
-    pesada.forEach((equipo) => grid.appendChild(crearTarjeta(equipo)));
-    wrapPesada.appendChild(grid);
-
-    const categoriasOrden = ['concreto', 'herramienta', 'energia', 'andamiaje', 'topografia', 'otros'];
-    categoriasOrden.forEach((cat) => {
-      const equiposCat = EQUIPOS.filter((e) => e.line === 'liviana' && e.cat === cat);
-      if (!equiposCat.length) return;
-      const bloque = document.createElement('div');
-      bloque.className = 'quote-category-block';
-      const titulo = document.createElement('h4');
-      titulo.className = 'quote-category-title';
-      titulo.textContent = CATEGORIA_LABELS[cat] || cat;
-      const gridCat = document.createElement('div');
-      gridCat.className = 'quote-items-grid';
-      equiposCat.forEach((equipo) => gridCat.appendChild(crearTarjeta(equipo)));
-      bloque.appendChild(titulo);
-      bloque.appendChild(gridCat);
-      wrapLiviana.appendChild(bloque);
+    // ---- Chips de categoría (Equipos Livianos) — se arman una sola vez ----
+    const chipDefs = [{ cat: 'all', label: 'Todas' }, ...categoriasOrden.map((cat) => ({ cat, label: CATEGORIA_LABELS[cat] || cat }))];
+    chipDefs.forEach((def) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'quote-chip';
+      chip.dataset.cat = def.cat;
+      chip.textContent = def.label;
+      chip.setAttribute('aria-pressed', String(def.cat === 'all'));
+      chip.addEventListener('click', () => {
+        currentCat = def.cat;
+        Array.from(catChipsWrap.querySelectorAll('.quote-chip')).forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === currentCat)));
+        renderList();
+      });
+      catChipsWrap.appendChild(chip);
     });
 
-    const allChecks = () => Array.from(quoteForm.querySelectorAll('.quote-item-check'));
-    const equipoPorId = (id) => EQUIPOS.find((e) => e.id === id);
+    const crearVacio = () => {
+      const p = document.createElement('p');
+      p.className = 'quote-list-empty';
+      p.textContent = 'No se encontraron equipos con ese nombre.';
+      return p;
+    };
 
-    // ---- Toggle de línea (Maquinaria Pesada / Equipos Livianos) ----
-    lineButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const line = btn.dataset.line;
-        const wrap = line === 'pesada' ? wrapPesada : wrapLiviana;
-        const isOpen = !wrap.hidden;
-        wrap.hidden = isOpen;
-        btn.setAttribute('aria-pressed', String(!isOpen));
+    const agregarDiasInput = (row, equipo) => {
+      const daysEl = document.createElement('span');
+      daysEl.className = 'quote-row-days';
+      daysEl.innerHTML = `<label for="dias-row-${equipo.id}">Días de alquiler</label><input type="number" min="1" id="dias-row-${equipo.id}" value="${diasGuardados[equipo.id] || ''}" placeholder="ej. 5">`;
+      daysEl.querySelector('input').addEventListener('input', (e) => {
+        diasGuardados[equipo.id] = e.target.value;
+      });
+      row.appendChild(daysEl);
+      return daysEl;
+    };
+
+    const toggleId = (equipo, row) => {
+      const toggleBtn = row.querySelector('.quote-row-toggle');
+      if (selectedIds.has(equipo.id)) {
+        selectedIds.delete(equipo.id);
+        delete diasGuardados[equipo.id];
+        row.classList.remove('is-added');
+        toggleBtn.textContent = '+';
+        toggleBtn.setAttribute('aria-label', `Agregar ${equipo.name}`);
+        const daysEl = row.querySelector('.quote-row-days');
+        if (daysEl) daysEl.remove();
+      } else {
+        selectedIds.add(equipo.id);
+        if (diasGuardados[equipo.id] === undefined) diasGuardados[equipo.id] = '';
+        row.classList.add('is-added');
+        toggleBtn.textContent = '✓';
+        toggleBtn.setAttribute('aria-label', `Quitar ${equipo.name}`);
+        const daysEl = agregarDiasInput(row, equipo);
+        daysEl.querySelector('input').focus();
+      }
+      updateCounter();
+    };
+
+    const crearFila = (equipo) => {
+      const row = document.createElement('div');
+      const yaAgregado = selectedIds.has(equipo.id);
+      row.className = 'quote-row' + (yaAgregado ? ' is-added' : '');
+      row.dataset.id = equipo.id;
+      row.innerHTML = `
+        <div class="quote-row-thumb"><img src="${equipo.img}" alt="" loading="lazy"></div>
+        <span class="quote-row-name">${equipo.name}</span>
+        <button type="button" class="quote-row-toggle" aria-label="${yaAgregado ? 'Quitar' : 'Agregar'} ${equipo.name}">${yaAgregado ? '✓' : '+'}</button>
+      `;
+      if (yaAgregado) agregarDiasInput(row, equipo);
+      row.querySelector('.quote-row-toggle').addEventListener('click', () => toggleId(equipo, row));
+      return row;
+    };
+
+    // ---- Pintar la lista según línea / categoría / búsqueda ----
+    const renderList = () => {
+      listWrap.innerHTML = '';
+      if (!currentLine) return;
+      const term = searchTerm.trim().toLowerCase();
+      const coincide = (e) => e.line === currentLine
+        && (currentLine === 'pesada' || currentCat === 'all' || e.cat === currentCat)
+        && (!term || e.name.toLowerCase().includes(term));
+
+      if (currentLine === 'liviana' && currentCat === 'all') {
+        let hayResultados = false;
+        categoriasOrden.forEach((cat) => {
+          const equiposCat = EQUIPOS.filter((e) => coincide(e) && e.cat === cat);
+          if (!equiposCat.length) return;
+          hayResultados = true;
+          const label = document.createElement('p');
+          label.className = 'quote-list-cat-label';
+          label.textContent = CATEGORIA_LABELS[cat] || cat;
+          listWrap.appendChild(label);
+          equiposCat.forEach((equipo) => listWrap.appendChild(crearFila(equipo)));
+        });
+        if (!hayResultados) listWrap.appendChild(crearVacio());
+      } else {
+        const equipos = EQUIPOS.filter(coincide);
+        if (!equipos.length) listWrap.appendChild(crearVacio());
+        else equipos.forEach((equipo) => listWrap.appendChild(crearFila(equipo)));
+      }
+    };
+
+    const updateCounter = () => {
+      const n = selectedIds.size;
+      selCountEl.textContent = String(n);
+      doneCountEl.textContent = `(${n})`;
+      doneBtn.disabled = n === 0;
+    };
+
+    // ---- Pestañas de línea (Maquinaria Pesada / Equipos Livianos) ----
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        currentLine = currentLine === tab.dataset.line ? null : tab.dataset.line;
+        currentCat = 'all';
+        searchTerm = '';
+        searchInput.value = '';
+        Array.from(catChipsWrap.querySelectorAll('.quote-chip')).forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === 'all')));
+        tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.line === currentLine)));
+        catChipsWrap.hidden = currentLine !== 'liviana';
+        searchInput.hidden = !currentLine;
+        quotePlaceholder.hidden = !!currentLine;
+        listWrap.hidden = !currentLine;
+        renderList();
       });
     });
 
-    // ---- Actualizar contador y estado del botón "Agrupar selección" ----
-    const actualizarContador = () => {
-      const n = allChecks().filter((c) => c.checked).length;
-      selCount.textContent = `(${n})`;
-      groupBtn.disabled = n === 0;
-      quoteHint.textContent = n === 0
-        ? 'Marca uno o varios equipos para agruparlos en tu solicitud.'
-        : `${n} equipo${n === 1 ? '' : 's'} marcado${n === 1 ? '' : 's'}. Cuando termines, da clic en "Agrupar selección".`;
-    };
-    quoteForm.addEventListener('change', (e) => {
-      if (e.target.classList.contains('quote-item-check')) {
-        e.target.closest('.quote-item').classList.toggle('is-checked', e.target.checked);
-        actualizarContador();
-      }
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      renderList();
     });
 
-    // ---- Construir el resumen a partir de lo marcado ----
+    // ---- "Listo": arma el resumen a partir de lo agregado ----
     const construirResumen = () => {
-      const seleccionados = allChecks().filter((c) => c.checked).map((c) => c.value);
-      if (seleccionados.length === 0) return;
-
+      if (selectedIds.size === 0) return;
       summaryList.innerHTML = '';
-      seleccionados.forEach((id) => {
+      Array.from(selectedIds).forEach((id) => {
         const equipo = equipoPorId(id);
         if (!equipo) return;
         const row = document.createElement('div');
@@ -321,14 +391,11 @@ document.addEventListener('DOMContentLoaded', () => {
           diasGuardados[id] = e.target.value;
         });
         row.querySelector('.summary-remove').addEventListener('click', () => {
-          const check = quoteForm.querySelector(`.quote-item-check[value="${id}"]`);
-          if (check) {
-            check.checked = false;
-            check.closest('.quote-item').classList.remove('is-checked');
-          }
+          selectedIds.delete(id);
           delete diasGuardados[id];
           row.remove();
-          actualizarContador();
+          updateCounter();
+          renderList();
           if (!summaryList.children.length) mostrarPicker();
         });
         summaryList.appendChild(row);
@@ -341,9 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const mostrarPicker = () => {
       quoteSummary.hidden = true;
       quotePicker.hidden = false;
+      renderList();
     };
 
-    groupBtn.addEventListener('click', construirResumen);
+    doneBtn.addEventListener('click', construirResumen);
     editSelectionBtn.addEventListener('click', mostrarPicker);
 
     // ---- Envío por EmailJS ----
@@ -354,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const filas = Array.from(summaryList.children);
       if (!filas.length) {
-        quoteStatus.textContent = 'Marca los equipos que necesitas y da clic en "Agrupar selección" antes de enviar.';
+        quoteStatus.textContent = 'Marca los equipos que necesitas y da clic en "Listo" antes de enviar.';
         quoteStatus.className = 'quote-status is-error';
         return;
       }
@@ -390,14 +458,21 @@ document.addEventListener('DOMContentLoaded', () => {
           quoteStatus.textContent = '¡Listo! Recibimos tu solicitud y te contactaremos pronto.';
           quoteStatus.className = 'quote-status is-success';
           quoteForm.reset();
-          allChecks().forEach((c) => c.closest('.quote-item').classList.remove('is-checked'));
+          selectedIds.clear();
           Object.keys(diasGuardados).forEach((k) => delete diasGuardados[k]);
           summaryList.innerHTML = '';
-          wrapPesada.hidden = true;
-          wrapLiviana.hidden = true;
-          lineButtons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          currentLine = null;
+          currentCat = 'all';
+          searchTerm = '';
+          searchInput.value = '';
+          tabs.forEach((t) => t.setAttribute('aria-pressed', 'false'));
+          Array.from(catChipsWrap.querySelectorAll('.quote-chip')).forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === 'all')));
+          catChipsWrap.hidden = true;
+          searchInput.hidden = true;
+          quotePlaceholder.hidden = false;
+          listWrap.hidden = true;
           mostrarPicker();
-          actualizarContador();
+          updateCounter();
         })
         .catch(() => {
           quoteStatus.textContent = 'No pudimos enviar la solicitud. Intenta de nuevo o escríbenos por WhatsApp.';
@@ -408,6 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
           quoteSubmitBtn.textContent = 'Enviar solicitud de cotización';
         });
     });
+
+    updateCounter();
   }
 
   /* ---- Año dinámico en el footer ---- */

@@ -243,30 +243,38 @@
         <span class="section-tag">Cotizador</span>
         <h3>Arma tu cotización</h3>
         <p class="quote-intro">
-          Selecciona la línea que necesitas, marca los equipos con su foto y agrúpalos.
-          Te escribimos con la información lista para confirmar disponibilidad.
+          Elige la línea, busca o filtra el equipo y agrégalo con el botón "+". Indica cuántos días lo necesitas
+          y da clic en "Listo" cuando termines.
         </p>
 
+        <div class="quote-counter-bar" id="quoteCounterBar">
+          <span class="quote-counter-icon" aria-hidden="true">🧰</span>
+          <span><strong id="selCount">0</strong> equipo(s) agregado(s)</span>
+        </div>
+
         <div class="quote-picker" id="quotePicker">
-          <div class="quote-line-toggle" role="group" aria-label="¿Qué necesitas?">
-            <span class="quote-line-label">¿Qué necesitas?</span>
-            <button type="button" class="line-btn" data-line="pesada" aria-pressed="false">Maquinaria Pesada</button>
-            <button type="button" class="line-btn" data-line="liviana" aria-pressed="false">Equipos Livianos</button>
+          <div class="quote-tabs" role="tablist" aria-label="¿Qué necesitas?">
+            <button type="button" class="quote-tab" data-line="pesada" aria-pressed="false">Maquinaria Pesada</button>
+            <button type="button" class="quote-tab" data-line="liviana" aria-pressed="false">Equipos Livianos</button>
           </div>
 
-          <div class="quote-items-wrap" id="quoteItemsPesada" hidden></div>
-          <div class="quote-items-wrap" id="quoteItemsLiviana" hidden></div>
+          <div class="quote-cat-chips" id="quoteCatChips" hidden></div>
 
-          <button type="button" class="btn btn-outline btn-sm quote-group-btn" id="groupBtn" disabled>
-            Agrupar selección <span class="quote-sel-count" id="selCount">(0)</span>
+          <input type="search" class="quote-search" id="quoteSearch" placeholder="Buscar equipo por nombre..." hidden>
+
+          <p class="quote-placeholder" id="quotePlaceholder">Selecciona una línea arriba para ver los equipos disponibles.</p>
+
+          <div class="quote-list" id="quoteList" hidden></div>
+
+          <button type="button" class="btn btn-primary btn-sm quote-done-btn" id="quoteDoneBtn" disabled>
+            Listo <span class="quote-sel-count" id="doneCount">(0)</span>
           </button>
-          <p class="quote-hint" id="quoteHint">Marca uno o varios equipos para agruparlos en tu solicitud.</p>
         </div>
 
         <div class="quote-summary" id="quoteSummary" hidden>
           <p class="quote-summary-msg">Deseo consultar o cotizar el alquiler de estos equipos:</p>
           <div class="summary-list" id="summaryList"></div>
-          <button type="button" class="quote-edit-link" id="editSelectionBtn">← Editar selección de equipos</button>
+          <button type="button" class="quote-edit-link" id="editSelectionBtn">← Seguir agregando equipos</button>
         </div>
 
         <div class="form-row">
