@@ -208,6 +208,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const EMAILJS_SERVICE_ID = 'service_iw2wenc';
   const EMAILJS_TEMPLATE_ID = 'template_lhs48r2';
 
+  /* IMPORTANTE: registro y priorización de cotizaciones en Google Sheets.
+     Reemplaza esta URL por la de tu Google Apps Script publicado como
+     Web App (ver instrucciones en README.md, sección "Registro y
+     priorización de cotizaciones"). Mientras tenga este valor de
+     ejemplo, el registro en la hoja simplemente se omite en silencio —
+     el correo por EmailJS sigue funcionando igual, sin depender de esto. */
+  const SHEETS_WEBAPP_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
+
   const quoteForm = document.getElementById('quoteForm');
   if (quoteForm) {
     if (typeof emailjs !== 'undefined') {
@@ -231,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editSelectionBtn = document.getElementById('editSelectionBtn');
     const quoteStatus = document.getElementById('quoteStatus');
     const quoteSubmitBtn = document.getElementById('quoteSubmitBtn');
+    const quoteDepartamentoEl = document.getElementById('quoteDepartamento');
 
     let currentLine = null;   // 'pesada' | 'liviana' | null
     let currentCat = 'all';   // solo aplica cuando currentLine === 'liviana'
@@ -427,15 +436,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const lineasEquipos = filas.map((row) => {
+      const formData = new FormData(quoteForm);
+      const departamento = (formData.get('departamento') || '').trim();
+      if (!departamento) {
+        quoteStatus.textContent = 'Selecciona el departamento de la obra antes de enviar.';
+        quoteStatus.className = 'quote-status is-error';
+        quoteDepartamentoEl.focus();
+        return;
+      }
+
+      const equiposLista = filas.map((row) => {
         const id = row.dataset.id;
         const equipo = equipoPorId(id);
         const dias = (diasGuardados[id] || '').trim();
-        return `- ${equipo ? equipo.name : id}: ${dias || '(días sin especificar)'} día(s)`;
+        return { id, nombre: equipo ? equipo.name : id, linea: equipo ? equipo.line : '', dias };
       });
+      const lineasEquipos = equiposLista.map((it) => `- ${it.nombre}: ${it.dias || '(días sin especificar)'} día(s)`);
       const equiposTexto = ['Deseo consultar o cotizar el alquiler de estos equipos:', ...lineasEquipos].join('\n');
 
-      const formData = new FormData(quoteForm);
       const params = {
         from_name: formData.get('nombre'),
         from_phone: formData.get('telefono'),
@@ -448,6 +466,29 @@ document.addEventListener('DOMContentLoaded', () => {
         quoteStatus.textContent = 'El envío por correo aún no está configurado. Mientras tanto, escríbenos directo por WhatsApp con estos datos.';
         quoteStatus.className = 'quote-status is-error';
         return;
+      }
+
+      // ---- Registro en Google Sheets para priorizar la cotización ----
+      // Envío "silencioso" en segundo plano: si falla o no está configurado
+      // (SHEETS_WEBAPP_URL sigue con el valor de ejemplo), no afecta en nada
+      // el envío del correo por EmailJS de arriba.
+      if (SHEETS_WEBAPP_URL && SHEETS_WEBAPP_URL !== 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT') {
+        try {
+          fetch(SHEETS_WEBAPP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              fecha: new Date().toISOString(),
+              nombre: formData.get('nombre') || '',
+              telefono: formData.get('telefono') || '',
+              email: formData.get('email') || '',
+              departamento,
+              mensaje: formData.get('mensaje') || '',
+              equipos: equiposLista,
+            }),
+          }).catch(() => { /* silencioso: no debe afectar la experiencia del usuario */ });
+        } catch (err) { /* silencioso */ }
       }
 
       quoteSubmitBtn.disabled = true;

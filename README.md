@@ -17,6 +17,8 @@ makra-web/
 │   └── styles.css      → Todos los estilos (colores, tipografías, responsive)
 ├── js/
 │   └── script.js       → Menú móvil, animaciones, filtros, formulario, resaltado del menú activo
+├── google-apps-script/
+│   └── Code.gs          → Script opcional para registrar y priorizar cotizaciones en Google Sheets (ver sección 5)
 ├── images/
 │   ├── favicon.png                   → Ícono de pestaña (ya en uso)
 │   ├── hero-makra.jpg                → Banner del inicio (ya en uso)
@@ -53,7 +55,7 @@ Si más adelante agregan o quitan equipos del inventario, tráeme la lista actua
 
 ## 4. El formulario "Arma tu cotización" (sección Contacto)
 
-El antiguo formulario simple "Envíanos un mensaje" y el Cotizador ahora son **un solo formulario**, dentro de la sección Contacto (`index.html`): el cliente elige la línea (Maquinaria Pesada y/o Equipos Livianos), marca con su foto los equipos puntuales que necesita (agrupados por categoría en Equipos Livianos, igual que en el catálogo), da clic en **"Agrupar selección"** y ahí puede indicar los días de alquiler de cada equipo antes de completar sus datos y enviar.
+El antiguo formulario simple "Envíanos un mensaje" y el Cotizador ahora son **un solo formulario**, dentro de la sección Contacto (`index.html`): el cliente elige la línea (Maquinaria Pesada y/o Equipos Livianos), marca con su foto los equipos puntuales que necesita (agrupados por categoría en Equipos Livianos, igual que en el catálogo), da clic en **"Agrupar selección"** y ahí puede indicar los días de alquiler de cada equipo antes de completar sus datos (nombre, teléfono, correo y **departamento de la obra** — este último es obligatorio y es clave para el cálculo de prioridad de la sección 5) y enviar.
 
 El catálogo de equipos que se muestra en el cotizador vive en `js/script.js`, en el arreglo `EQUIPOS` (al inicio del bloque "Cotizador"). Si agregan o quitan un equipo del inventario, se edita ahí mismo (nombre, imagen, línea y categoría) — no hace falta tocar el HTML.
 
@@ -107,7 +109,44 @@ Para que cada correo de cotización quede aparte y no se te pase entre el resto 
 6. Si quieres que también aplique a cotizaciones que ya te hayan llegado antes, marca **"Aplicar también a las conversaciones que coincidan"** antes de crear el filtro.
 7. Da clic en **"Crear filtro"**. Listo — desde ahora, cada vez que alguien cotice desde la página, el correo te llega a la bandeja normal y también queda guardado en la etiqueta "Cotizaciones Web" (la ves en la barra lateral izquierda de Gmail), para que puedas repasarlas todas juntas cuando quieras.
 
-## 5. Publicar el sitio (hosting gratis recomendado: Netlify)
+## 5. Registro y priorización de cotizaciones (Google Sheets)
+
+Además del correo que te llega por EmailJS, cada cotización puede quedar guardada en una Hoja de Cálculo de Google, con un cálculo automático de qué tan valiosa es (para ayudarte a decidir a cuál responder primero cuando lleguen varias). Esto es **opcional** — si no lo configuras, el formulario sigue funcionando exactamente igual y el correo te sigue llegando; simplemente no queda este registro extra.
+
+**Cómo funciona, en criollo:** por cada equipo que el cliente marcó, multiplica los días de alquiler por un precio por día (que tú defines). A esa suma le resta un costo de transporte estimado, calculado según qué tan lejos está el departamento de la obra desde Santa Marta (y si hay maquinaria pesada de por medio, que necesita cama baja). El resultado es el "valor neto estimado" de esa cotización, y con eso la hoja le pone una etiqueta: 🟢 Alta, 🟡 Media o 🔴 Baja prioridad. Por ejemplo, tu caso de Villavicencio (8 meses) vs. Bolívar/Mompós (3 meses): aunque Villavicencio quede más lejos y pague más transporte, esa distancia es un costo único, mientras que los meses de alquiler se multiplican — por eso normalmente el cliente de más días termina con mayor "valor neto", y la hoja te lo muestra así de una vez, ordenado, sin que tengas que calcularlo a mano.
+
+**Aviso importante — para que sepas exactamente qué estás usando:** esto **no es un modelo de "machine learning"** — es una fórmula simple y 100% transparente (multiplicaciones y restas), no una predicción de un algoritmo entrenado con datos históricos. Es justo lo que tú mismo dijiste que empecemos con "algo sencillo". Un modelo más sofisticado (el "chillertín" del que hablabas) sí seria posible más adelante, pero necesita muchas cotizaciones históricas ya cerradas (con resultado real: si se alquiló o no, por cuánto, etc.) para "aprender" patrones — algo que iríamos acumulando con el tiempo si usamos esta hoja desde ya.
+
+También debes saber que **los tres tipos de números que usa la fórmula son estimaciones mías, no tarifas reales de MAKRA**:
+- **Precio por día de cada equipo**: no encontré tarifas públicas confiables para tus modelos específicos (SANY, Bobcat, etc.) — las que hay publicadas en internet son de máquinas más grandes o de otras marcas. Puse números de referencia razonables solo para que la hoja funcione desde el primer día.
+- **Costo de transporte por km**: en Colombia las empresas de cama baja/transporte de maquinaria cotizan caso por caso — no hay una tarifa pública por kilómetro. También puse un estimado de referencia.
+- **Distancias por departamento desde Santa Marta**: son aproximaciones mías por carretera, no mediciones oficiales.
+
+La buena noticia: **los tres viven en la Hoja de Cálculo, no en el código** — puedes corregirlos tú mismo en cualquier momento (por ejemplo, en cuanto sepas cuánto te costó realmente un transporte a Villavicencio), sin tocar una sola línea de `script.js`, y la próxima cotización que llegue ya usa el número corregido.
+
+### Instalación (una sola vez)
+
+1. Crea una Hoja de Cálculo nueva en https://sheets.google.com — llámala, por ejemplo, "MAKRA — Cotizaciones".
+2. Dentro de esa hoja, ve al menú **Extensiones → Apps Script**. Se abrirá un editor de código en una pestaña nueva.
+3. Borra todo el código de ejemplo que aparece ahí (`function myFunction() {...}`) y pega en su lugar **todo** el contenido del archivo `google-apps-script/Code.gs` que te envié.
+4. Guarda (ícono de disquete o `Ctrl+S`).
+5. Arriba, junto al botón ▶ **Ejecutar**, hay un desplegable de funciones — elige **`configurarHojas`** y da clic en ▶ **Ejecutar**.
+   - La primera vez te va a pedir autorización ("Se requiere autorización" → "Revisar permisos" → elige tu cuenta de Google → puede que aparezca una pantalla de advertencia de Google porque el script es tuyo y no está "verificado" por Google; da clic en "Avanzado" → "Ir a [nombre del proyecto] (no seguro)" → "Permitir"). Es tu propio script, así que es seguro autorizarlo.
+   - Cuando termine, vuelve a la pestaña de la Hoja de Cálculo: ya deberías ver 5 pestañas nuevas abajo: **Config-Equipos**, **Config-Distancias**, **Config-Parametros**, **Cotizaciones** y **Resumen**.
+6. Revisa **Config-Equipos** y corrige los precios por día que conozcas (no hace falta que los corrijas todos de una — puedes ir ajustando con el tiempo). Lo mismo con **Config-Distancias** y **Config-Parametros** si tienes mejores números.
+7. De vuelta en el editor de Apps Script: menú **Implementar → Nueva implementación**. En "Selecciona el tipo", el ícono de engranaje → **Aplicación web**. Configura:
+   - **Ejecutar como**: Yo (tu cuenta)
+   - **Quién tiene acceso**: Cualquier usuario
+   Da clic en **Implementar**, autoriza de nuevo si te lo pide, y copia la **URL de la aplicación web** que te entrega (termina en `/exec`).
+8. Abre `js/script.js`, busca la constante `SHEETS_WEBAPP_URL` (cerca de las constantes de EmailJS) y reemplaza el valor de ejemplo por esa URL:
+   ```js
+   const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
+   ```
+9. Guarda, sube el cambio a GitHub y espera a que Cloudflare Pages despliegue. Envía una cotización de prueba desde el sitio en vivo y revisa que aparezca una fila nueva en la pestaña **Cotizaciones** (y en **Resumen**, ordenada por valor neto).
+
+Si en algún momento cambias o agregas equipos en `js/script.js` (el arreglo `EQUIPOS`), agrega también esa fila en **Config-Equipos** con su precio por día — si un equipo no está ahí, la hoja simplemente lo cuenta como $0 en el cálculo (no rompe nada, solo subestima el valor de esa cotización).
+
+## 6. Publicar el sitio (hosting gratis recomendado: Netlify)
 
 No tienes que pagar nada para tener el sitio en línea. La opción más rápida es **Netlify**:
 
@@ -121,14 +160,14 @@ No tienes que pagar nada para tener el sitio en línea. La opción más rápida 
 - **Vercel** (https://vercel.com): funciona muy parecido a Netlify, ideal si luego quieres conectar con GitHub para que se actualice el sitio automáticamente cada vez que hagas un cambio.
 - **GitHub Pages** (gratis, requiere tener el proyecto en un repositorio de GitHub): bueno si ya usas o quieres aprender Git/GitHub desde VS Code.
 
-## 6. Buenas prácticas al agregar tus propias fotos
+## 7. Buenas prácticas al agregar tus propias fotos
 
 - Comprime las fotos antes de subirlas (herramientas gratis como https://squoosh.app o https://tinypng.com) para que el sitio cargue rápido.
 - Usa un tamaño similar entre todas las fotos de una misma sección para que la cuadrícula se vea pareja.
 - Nombra los archivos sin espacios ni tildes (ej. `minicargador-01.jpg`).
 - Revisa cada foto nueva antes de subirla para confirmar que no muestre el nombre legal de la constructora ni su logo (ver sección 2).
 
-## 7. Personalizar colores
+## 8. Personalizar colores
 
 Los colores del sitio están centralizados al inicio de `css/styles.css`, en la sección `:root`. Por ejemplo:
 
