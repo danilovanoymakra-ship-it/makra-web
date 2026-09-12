@@ -55,7 +55,7 @@ Si más adelante agregan o quitan equipos del inventario, tráeme la lista actua
 
 ## 4. El formulario "Arma tu cotización" (sección Contacto)
 
-El antiguo formulario simple "Envíanos un mensaje" y el Cotizador ahora son **un solo formulario**, dentro de la sección Contacto (`index.html`): el cliente elige la línea (Maquinaria Pesada y/o Equipos Livianos), marca con su foto los equipos puntuales que necesita (agrupados por categoría en Equipos Livianos, igual que en el catálogo), da clic en **"Agrupar selección"** y ahí puede indicar los días de alquiler de cada equipo antes de completar sus datos (nombre, teléfono, correo y **departamento de la obra** — este último es obligatorio y es clave para el cálculo de prioridad de la sección 5) y enviar.
+El antiguo formulario simple "Envíanos un mensaje" y el Cotizador ahora son **un solo formulario**, dentro de la sección Contacto (`index.html`): el cliente elige la línea (Maquinaria Pesada y/o Equipos Livianos), marca con su foto los equipos puntuales que necesita (agrupados por categoría en Equipos Livianos, igual que en el catálogo), da clic en **"Agrupar selección"** y ahí puede indicar los días de alquiler de cada equipo antes de completar sus datos (nombre, teléfono, correo, **departamento** y **municipio o ciudad de la obra** — ambos obligatorios y clave para el cálculo de prioridad de la sección 5) y enviar.
 
 El catálogo de equipos que se muestra en el cotizador vive en `js/script.js`, en el arreglo `EQUIPOS` (al inicio del bloque "Cotizador"). Si agregan o quitan un equipo del inventario, se edita ahí mismo (nombre, imagen, línea y categoría) — no hace falta tocar el HTML.
 
@@ -115,6 +115,8 @@ Además del correo que te llega por EmailJS, cada cotización puede quedar guard
 
 **Cómo funciona, en criollo:** por cada equipo que el cliente marcó, multiplica los días de alquiler por un precio por día (que tú defines). A esa suma le resta un costo de transporte estimado, calculado según qué tan lejos está el departamento de la obra desde Santa Marta (y si hay maquinaria pesada de por medio, que necesita cama baja). El resultado es el "valor neto estimado" de esa cotización, y con eso la hoja le pone una etiqueta: 🟢 Alta, 🟡 Media o 🔴 Baja prioridad. Por ejemplo, tu caso de Villavicencio (8 meses) vs. Bolívar/Mompós (3 meses): aunque Villavicencio quede más lejos y pague más transporte, esa distancia es un costo único, mientras que los meses de alquiler se multiplican — por eso normalmente el cliente de más días termina con mayor "valor neto", y la hoja te lo muestra así de una vez, ordenado, sin que tengas que calcularlo a mano.
 
+**Sobre el municipio (no solo el departamento):** en Colombia, dentro de un mismo departamento la distancia real puede variar muchísimo si no hay buenas vías — por eso el formulario también pide el municipio o ciudad exacta, no solo el departamento. Por ahora el cálculo automático del transporte sigue usando la distancia a nivel de departamento (es lo "sencillo" con lo que arrancamos); el municipio queda guardado en su propia columna en la pestaña **Cotizaciones**, como dato adicional para que tú lo revises a ojo caso por caso. Si más adelante quieres que el cálculo automático también use el municipio, es posible, pero requiere una tabla de distancias mucho más detallada (Colombia tiene más de 1.000 municipios) o conectar un servicio de geocodificación — dímelo cuando llegues a ese punto y lo construimos.
+
 **Aviso importante — para que sepas exactamente qué estás usando:** esto **no es un modelo de "machine learning"** — es una fórmula simple y 100% transparente (multiplicaciones y restas), no una predicción de un algoritmo entrenado con datos históricos. Es justo lo que tú mismo dijiste que empecemos con "algo sencillo". Un modelo más sofisticado (el "chillertín" del que hablabas) sí seria posible más adelante, pero necesita muchas cotizaciones históricas ya cerradas (con resultado real: si se alquiló o no, por cuánto, etc.) para "aprender" patrones — algo que iríamos acumulando con el tiempo si usamos esta hoja desde ya.
 
 También debes saber que **los tres tipos de números que usa la fórmula son estimaciones mías, no tarifas reales de MAKRA**:
@@ -146,19 +148,22 @@ La buena noticia: **los tres viven en la Hoja de Cálculo, no en el código** �
 
 Si en algún momento cambias o agregas equipos en `js/script.js` (el arreglo `EQUIPOS`), agrega también esa fila en **Config-Equipos** con su precio por día — si un equipo no está ahí, la hoja simplemente lo cuenta como $0 en el cálculo (no rompe nada, solo subestima el valor de esa cotización).
 
-## 6. Publicar el sitio (hosting gratis recomendado: Netlify)
+## 6. Hosting y dominio — en qué quedamos
 
-No tienes que pagar nada para tener el sitio en línea. La opción más rápida es **Netlify**:
+**El hosting ya está resuelto y en producción, no falta nada ahí.** El sitio vive en un repositorio de GitHub (`danilovanoymakra-ship-it/makra-web`) conectado a **Cloudflare Pages**, gratis. Cada vez que haces `git push` a la rama `main`, Cloudflare lo detecta solo y publica la versión nueva en 1-2 minutos — así ha estado funcionando todo este tiempo, incluyendo cada uno de los cambios que hemos hecho en esta conversación. La URL gratuita que te da Cloudflare por ahora es:
 
-1. Ve a https://app.netlify.com y crea una cuenta gratis (puedes usar tu correo o GitHub).
-2. En el panel, busca la opción de arrastrar y soltar ("Deploy manually" / "Drag and drop your site folder").
-3. Arrastra la carpeta `makra-web` completa (o comprime su contenido y arrástralo).
-4. En segundos tu sitio queda publicado con una URL tipo `https://nombre-al-azar.netlify.app`.
-5. Puedes cambiar ese nombre desde "Site settings" por algo como `https://makra-sas.netlify.app`, y más adelante conectar un dominio propio (ej. `www.grupomakra.com`) desde "Domain settings" si compras uno.
+```
+https://makra-web.pages.dev
+```
 
-**Alternativas igual de válidas:**
-- **Vercel** (https://vercel.com): funciona muy parecido a Netlify, ideal si luego quieres conectar con GitHub para que se actualice el sitio automáticamente cada vez que hagas un cambio.
-- **GitHub Pages** (gratis, requiere tener el proyecto en un repositorio de GitHub): bueno si ya usas o quieres aprender Git/GitHub desde VS Code.
+Lo único que queda pendiente, si lo quieres, es reemplazar esa URL por un **dominio propio** (algo como `www.grupomakra.com` en vez de `makra-web.pages.dev`). Esto tiene dos partes separadas:
+
+1. **Comprar el dominio** (esto tiene un costo anual, normalmente entre 10 y 15 USD/año). Puedes comprarlo en cualquier registrador — Namecheap, GoDaddy, o directamente en **Cloudflare Registrar** (`https://dash.cloudflare.com` → "Domain Registration"), que suele salir más barato porque no le suman margen de reventa, y además queda todo en el mismo panel de Cloudflare donde ya está el sitio.
+2. **Conectarlo a Cloudflare Pages**: una vez tengas el dominio (comprado ahí o en otro lado), entras al proyecto `makra-web` dentro de Cloudflare Pages → pestaña **"Custom domains"** → **"Set up a custom domain"** → escribes tu dominio y Cloudflare te guía para apuntar los DNS. Esto no toca el código del sitio para nada, es pura configuración en el panel de Cloudflare.
+
+Si ya tienes un dominio comprado en otro lado (o un nombre en mente), dime y seguimos derecho al paso 2. Si no, te ayudo a decidir el nombre y a comprarlo.
+
+**Alternativas de hosting** (no las necesitas, ya tienes Cloudflare Pages funcionando, pero por si algún día quieres comparar): Netlify y Vercel funcionan de forma muy similar (arrastrar la carpeta o conectar el repo de GitHub); GitHub Pages es otra opción gratis si el proyecto ya está en GitHub.
 
 ## 7. Buenas prácticas al agregar tus propias fotos
 

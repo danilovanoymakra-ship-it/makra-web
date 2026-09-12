@@ -240,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteStatus = document.getElementById('quoteStatus');
     const quoteSubmitBtn = document.getElementById('quoteSubmitBtn');
     const quoteDepartamentoEl = document.getElementById('quoteDepartamento');
+    const quoteMunicipioEl = document.getElementById('quoteMunicipio');
 
     let currentLine = null;   // 'pesada' | 'liviana' | null
     let currentCat = 'all';   // solo aplica cuando currentLine === 'liviana'
@@ -445,6 +446,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      const municipio = (formData.get('municipio') || '').trim();
+      if (!municipio) {
+        quoteStatus.textContent = 'Escribe el municipio o ciudad de la obra antes de enviar.';
+        quoteStatus.className = 'quote-status is-error';
+        quoteMunicipioEl.focus();
+        return;
+      }
+
       const equiposLista = filas.map((row) => {
         const id = row.dataset.id;
         const equipo = equipoPorId(id);
@@ -452,7 +461,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return { id, nombre: equipo ? equipo.name : id, linea: equipo ? equipo.line : '', dias };
       });
       const lineasEquipos = equiposLista.map((it) => `- ${it.nombre}: ${it.dias || '(días sin especificar)'} día(s)`);
-      const equiposTexto = ['Deseo consultar o cotizar el alquiler de estos equipos:', ...lineasEquipos].join('\n');
+      const equiposTexto = [
+        `Departamento de la obra: ${departamento}`,
+        `Municipio / ciudad: ${municipio}`,
+        '',
+        'Deseo consultar o cotizar el alquiler de estos equipos:',
+        ...lineasEquipos,
+      ].join('\n');
 
       const params = {
         from_name: formData.get('nombre'),
@@ -484,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
               telefono: formData.get('telefono') || '',
               email: formData.get('email') || '',
               departamento,
+              municipio,
               mensaje: formData.get('mensaje') || '',
               equipos: equiposLista,
             }),

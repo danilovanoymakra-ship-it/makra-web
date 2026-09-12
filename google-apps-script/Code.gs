@@ -11,6 +11,17 @@
  *
  * y una "Prioridad" (🟢 Alta / 🟡 Media / 🔴 Baja) según ese valor neto.
  *
+ * Nota sobre el Municipio: el formulario también pide el municipio/ciudad
+ * exacta de la obra (no solo el departamento), porque dentro de un mismo
+ * departamento la distancia real puede variar muchísimo según las vías de
+ * acceso. Por ahora el cálculo automático de transporte SIGUE usando la
+ * distancia a nivel de departamento (Config-Distancias) — el municipio se
+ * guarda como dato adicional en la columna "Municipio" para que tú lo uses
+ * al revisar cada cotización a ojo. Si más adelante quieres que el cálculo
+ * automático también use el municipio, se puede agregar una tabla de
+ * distancias más detallada (o un servicio de geocodificación) — es un
+ * paso más grande porque Colombia tiene más de 1.000 municipios.
+ *
  * IMPORTANTE — esto NO es un modelo de "machine learning": es una
  * fórmula simple y transparente, 100% editable por ti. Todos los
  * precios y distancias viven en las hojas "Config-*" de abajo — puedes
@@ -186,7 +197,7 @@ function configurarHojas() {
   // ---- Cotizaciones ----
   const hojaCot = obtenerOCrearHoja_(ss, HOJA_COTIZACIONES);
   hojaCot.clear();
-  const encabezadosCot = ['Fecha', 'Nombre', 'Teléfono', 'Correo', 'Departamento',
+  const encabezadosCot = ['Fecha', 'Nombre', 'Teléfono', 'Correo', 'Departamento', 'Municipio',
     'Distancia (km)', 'Acceso', 'Línea', 'Equipos', 'Días totales',
     'Valor estimado equipos (COP)', 'Costo transporte estimado (COP)',
     'Valor neto estimado (COP)', 'Prioridad', 'Mensaje', 'Equipos (detalle técnico)'];
@@ -196,15 +207,15 @@ function configurarHojas() {
   // ---- Resumen (leaderboard en vivo, ordenado por valor neto) ----
   const hojaResumen = obtenerOCrearHoja_(ss, HOJA_RESUMEN);
   hojaResumen.clear();
-  hojaResumen.getRange(1, 1, 1, 8).setValues([[
-    'Fecha', 'Nombre', 'Teléfono', 'Departamento', 'Equipos', 'Días totales', 'Valor neto estimado (COP)', 'Prioridad',
+  hojaResumen.getRange(1, 1, 1, 9).setValues([[
+    'Fecha', 'Nombre', 'Teléfono', 'Departamento', 'Municipio', 'Equipos', 'Días totales', 'Valor neto estimado (COP)', 'Prioridad',
   ]]).setFontWeight('bold');
   hojaResumen.getRange('A2').setFormula(
-    '=IFERROR(QUERY(' + HOJA_COTIZACIONES + '!A2:P, ' +
-    '"select A,B,C,E,I,J,M,N where A is not null order by M desc", 0), "Aún no hay cotizaciones registradas.")'
+    '=IFERROR(QUERY(' + HOJA_COTIZACIONES + '!A2:Q, ' +
+    '"select A,B,C,E,F,J,K,N,O where A is not null order by N desc", 0), "Aún no hay cotizaciones registradas.")'
   );
   hojaResumen.setFrozenRows(1);
-  hojaResumen.autoResizeColumns(1, 8);
+  hojaResumen.autoResizeColumns(1, 9);
 
   ss.toast('Listo: hojas Config-Equipos, Config-Distancias, Config-Parametros, Cotizaciones y Resumen creadas/actualizadas.');
 }
@@ -340,6 +351,7 @@ function registrarCotizacion_(datos, r) {
     datos.telefono || '',
     datos.email || '',
     datos.departamento || '',
+    datos.municipio || '',
     r.distanciaKm === null ? 'N/D' : r.distanciaKm,
     r.acceso + (r.notaTransporte ? ` — ${r.notaTransporte}` : ''),
     r.linea,
