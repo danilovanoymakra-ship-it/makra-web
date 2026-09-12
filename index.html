@@ -327,7 +327,9 @@
           </select>
         </label>
         <label>Municipio o ciudad de la obra
-          <input type="text" name="municipio" id="quoteMunicipio" placeholder="Ej. Santa Marta, Ciénaga, Fundación..." required>
+          <select name="municipio" id="quoteMunicipio" required disabled>
+            <option value="" selected>Primero selecciona el departamento</option>
+          </select>
         </label>
         <label>Mensaje adicional (opcional)
           <textarea name="mensaje" rows="3" placeholder="Detalles extra: fechas, dirección de la obra, etc."></textarea>
